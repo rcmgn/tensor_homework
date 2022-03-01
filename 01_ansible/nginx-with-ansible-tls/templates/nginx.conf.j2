@@ -1,0 +1,12 @@
+
+server {
+    listen {{ nginx_port_with_tls }} ssl;
+    root /usr/share/nginx/html;
+    index index.html index.htm;
+    server_name {{ ansible_host }};
+    ssl_certificate     /etc/nginx/localhost.crt;
+    ssl_certificate_key /etc/nginx/device.key;
+    location / {
+            try_files $uri $uri/ =404;
+    }
+}
