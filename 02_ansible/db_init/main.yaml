@@ -1,0 +1,63 @@
+---
+- name: install MariaDB
+  hosts: nodes
+  become: true
+  vars_files:
+    - vars/main.yaml
+  tasks:
+    - name: Install 'mariadb-server' and 'MySQL-python' packages
+      ansible.builtin.yum:
+        name: ["mariadb-server", "MySQL-python"]
+        state: "present"
+
+    - name: Ensure 'mariadb' service start and enable
+      ansible.builtin.service:
+        name: "mariadb"
+        enabled: yes
+        state: "started"
+
+    # - name: Ensure 'mariadb' service is started and enabled
+    #   debug:
+    #     msg: =======
+    #   failed_when: true
+
+    - name: Set up root user
+      community.mysql.mysql_user:
+        name: "root"
+        password: "{{ db_root_password }}"
+        login_user: "root"
+        login_password: "{{ db_root_password }}"
+        check_implicit_admin: true
+        # login_unix_socket: "/var/run/mysqld/mysqld.sock"
+
+    - name: Create "{{ db_name }}" database
+      community.mysql.mysql_db:
+        name: "{{ db_name }}"
+        state: "present"
+        login_user: "root"
+        login_password: "{{ db_root_password }}"
+
+    - name: Remove anonymous users
+      community.mysql.mysql_user:
+        name: ""
+        state: absent
+        login_user: "root"
+        login_password: "{{ db_root_password }}"
+
+    - name: Remove test database
+      community.mysql.mysql_db:
+        name: "test"
+        state: absent
+        login_user: "root"
+        login_password: "{{ db_root_password }}"
+
+    - name: >
+        Create database user "{{ db_user }}" with "{{ db_password }}"
+        and "{{ db_name }}".*:ALL privelege
+      community.mysql.mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: '*.*:ALL'
+        login_user: "root"
+        login_password: "{{ db_root_password }}"
+

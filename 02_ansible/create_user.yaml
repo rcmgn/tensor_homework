@@ -1,0 +1,17 @@
+---
+- name: Create users in host by ansible
+  hosts: nodes
+  vars_files:
+    - credentionals.yaml
+  tasks:
+    - name: "Create user"
+      ansible.builtin.user:
+        name: "{{ user }}"
+        comment: "Ansible-generated user"
+        password: "{{ password | password_hash('sha512') }}"
+        state: "present"
+      loop: "{{ users }}"
+      loop_control:
+        loop_var: user
+        pause: 5
+      become: true
