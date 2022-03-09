@@ -16,11 +16,6 @@
         enabled: yes
         state: "started"
 
-    # - name: Ensure 'mariadb' service is started and enabled
-    #   debug:
-    #     msg: =======
-    #   failed_when: true
-
     - name: Set up root user
       community.mysql.mysql_user:
         name: "root"
@@ -28,7 +23,7 @@
         login_user: "root"
         login_password: "{{ db_root_password }}"
         check_implicit_admin: true
-        # login_unix_socket: "/var/run/mysqld/mysqld.sock"
+      no_log: True
 
     - name: Create "{{ db_name }}" database
       community.mysql.mysql_db:
@@ -36,6 +31,7 @@
         state: "present"
         login_user: "root"
         login_password: "{{ db_root_password }}"
+      no_log: True
 
     - name: Remove anonymous users
       community.mysql.mysql_user:
@@ -43,6 +39,7 @@
         state: absent
         login_user: "root"
         login_password: "{{ db_root_password }}"
+      no_log: True
 
     - name: Remove test database
       community.mysql.mysql_db:
@@ -50,6 +47,7 @@
         state: absent
         login_user: "root"
         login_password: "{{ db_root_password }}"
+      no_log: True
 
     - name: >
         Create database user "{{ db_user }}" with "{{ db_password }}"
@@ -60,4 +58,5 @@
         priv: '*.*:ALL'
         login_user: "root"
         login_password: "{{ db_root_password }}"
+      no_log: True
 
