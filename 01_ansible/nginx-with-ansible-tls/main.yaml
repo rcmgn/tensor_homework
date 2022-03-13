@@ -29,23 +29,48 @@
         mode: 0644
       notify: restart nginx
 
-    - name: copy file certificate signing request
-      copy:
-        src: files/localhost.csr
-        dest: /etc/nginx/localhost.csr
-        owner: root
-        group: root
-        mode: 0644
-      notify: restart nginx
+    - name: Install openssl package
+      yum:
+        name: ["openssl", "pyOpenSSL"]
+        state: "latest"
+        update_cache: true
+    
+    - name: Create ssl directory
+      file:
+        path: "/etc/nginx/ssl/"
+        state: directory
+        mode: 0775
+   
+    - name: Generate Private key
+      community.crypto.openssl_privatekey:
+        path: "/etc/nginx/ssl/device.key"
+    
+    - name: Generate CSR
+      community.crypto.openssl_csr: 
+        path: /etc/nginx/ssl/localhost.csr
+        privatekey_path: /etc/nginx/ssl/device.key 
+        common_name: mycomp.com 
+        country_name: RU
+        email_address: mail@mail.com
+        organization_name: MyOrg
 
-    - name: copy private key  file
-      copy:
-        src: files/device.key
-        dest: /etc/nginx/device.key
-        owner: root
-        group: root
-        mode: 0644
-      notify: restart nginx
+    # - name: copy file certificate signing request
+    #   copy:
+    #     src: files/localhost.csr
+    #     dest: /etc/nginx/localhost.csr
+    #     owner: root
+    #     group: root
+    #     mode: 0644
+    #   notify: restart nginx
+
+    # - name: copy private key  file
+    #   copy:
+    #     src: files/device.key
+    #     dest: /etc/nginx/device.key
+    #     owner: root
+    #     group: root
+    #     mode: 0644
+    #   notify: restart nginx
 
     - name: copy site's nginx config file
       template:
@@ -62,7 +87,7 @@
         warn: False
  
     - name: Generate a Self Signed OpenSSL certificate
-      openssl_certificate:
+      community.crypto.x509_certificate:
         path: /etc/nginx/localhost.crt
         privatekey_path: /etc/nginx/device.key
         csr_path: /etc/nginx/localhost.csr
