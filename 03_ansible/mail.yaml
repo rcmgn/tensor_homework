@@ -1,0 +1,16 @@
+---
+- name: configure nginx and MariaDB with roles
+  hosts: nodes
+  
+  tasks:
+    - name: create ssl
+      import_role:
+        name: "create_ssl"
+
+    - name: install nginx
+      import_role:
+        name: "deploy_nginx"
+
+    - name: install mariadb
+      import_role:
+        name: "deploy_mariadb"

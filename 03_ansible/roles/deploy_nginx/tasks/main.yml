@@ -1,0 +1,75 @@
+---
+# configure webserver with tls
+- name: create nginx repo definition
+  ansible.builtin.copy:
+    src: nginx.repo
+    dest: /etc/yum.repos.d/nginx.repo
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  tags: nginx    
+
+- name: install nginx
+  ansible.builtin.yum:
+    name: nginx
+    update_cache: true
+    state: present
+  become: true
+  tags: nginx
+
+- name: copy main nginx config file
+  ansible.builtin.copy:
+    src: files/nginx.conf
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  tags: nginx
+
+- name: copy site's nginx config file
+  ansible.builtin.template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/conf.d/tls.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  tags: nginx
+
+- name: copy index.html
+  ansible.builtin.template:
+    src: templates/index.html.j2
+    dest: /usr/share/nginx/html/index.html
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  tags: nginx
+
+- name: ensure nginx is enabled and started
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+  become: true
+  tags: nginx
+
+- name: insert firewalld rule for nginx
+  ansible.builtin.firewalld:
+    port: "{{ nginx_port_with_tls }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+  ignore_errors: true
+  become: true
+  tags: nginx
+
+- name: resret nginx
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
+  become: true
+  tags: nginx
+

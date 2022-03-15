@@ -1,0 +1,26 @@
+---
+# tasks file for create_ssl
+
+- name: create nginx dir
+  ansible.builtin.file:
+    name: "/etc/nginx/"
+    state: directory
+  become: true
+
+- name: copy ssl certificate
+  ansible.builtin.template:
+    src: files/localhost.crt
+    dest: /etc/nginx/localhost.crt
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+
+- name: copy ssl key
+  ansible.builtin.template:
+    src: files/device.key
+    dest: /etc/nginx/device.key
+    owner: root
+    group: root
+    mode: 0644
+  become: true
