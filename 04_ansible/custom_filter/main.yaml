@@ -1,0 +1,11 @@
+---
+- name: test
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    string1: "48205687642A"
+  tasks:
+    - name: convert MAC address filter
+      debug:
+        msg: "{{ string1 | convert_mac }}"
