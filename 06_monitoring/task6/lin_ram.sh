@@ -1,4 +1,5 @@
 #!/bin/sh
+# Bash script for getting memory usage in flux line protocol format
 
 get_ram=$(free -m | grep Mem)
 total_ram=$(echo $get_ram | awk '{print $2}')

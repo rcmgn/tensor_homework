@@ -1,4 +1,6 @@
 #!/bin/env python3
+# Python script for getting memory usage in flux line protocol format
+
 import psutil
 import datetime, time
 
