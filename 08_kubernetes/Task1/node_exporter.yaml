@@ -1,0 +1,21 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: node-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+	  app: app
+  template:
+    metadata:
+	  labels:
+	    app: app
+	spec:
+	  containers:
+	  - name: node-exporter
+		image: prom/node-exporter
+		ports:
+		- containersPort: 80
+		  protocol: "TCP"
+    
